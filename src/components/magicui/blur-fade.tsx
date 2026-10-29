@@ -1,5 +1,3 @@
-"use client";
-
 import { AnimatePresence, motion, useInView, Variants } from "motion/react";
 import { useRef } from "react";
 

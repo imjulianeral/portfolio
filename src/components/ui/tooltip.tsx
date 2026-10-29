@@ -1,42 +1,70 @@
 "use client";
 
-import * as TooltipPrimitive from "@radix-ui/react-tooltip";
+import { Tooltip as TooltipPrimitive } from "@base-ui/react/tooltip";
 import * as React from "react";
 
 import { cn } from "@/lib/utils";
 
 const TooltipProvider = TooltipPrimitive.Provider;
-
 const Tooltip = TooltipPrimitive.Root;
-
 const TooltipTrigger = TooltipPrimitive.Trigger;
 
-const TooltipContent = React.forwardRef<
-  React.ElementRef<typeof TooltipPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof TooltipPrimitive.Content>
->(({ className, sideOffset = 4, ...props }, ref) => (
-  <TooltipPrimitive.Content
-    ref={ref}
-    sideOffset={sideOffset}
-    className={cn(
-      "z-50 overflow-hidden rounded-md bg-primary px-3 py-1.5 text-xs text-primary-foreground animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
-      className
-    )}
-    {...props}
-  />
-));
-TooltipContent.displayName = TooltipPrimitive.Content.displayName;
+type TooltipContentProps = React.ComponentPropsWithoutRef<typeof TooltipPrimitive.Popup> &
+  Pick<
+    React.ComponentPropsWithoutRef<typeof TooltipPrimitive.Positioner>,
+    "side" | "sideOffset" | "align" | "alignOffset"
+  >;
+
+const TooltipContent = React.forwardRef<HTMLDivElement, TooltipContentProps>(
+  (
+    { className, side = "top", sideOffset = 4, align = "center", alignOffset = 0, ...props },
+    ref,
+  ) => (
+    <TooltipPrimitive.Portal>
+      <TooltipPrimitive.Positioner
+        side={side}
+        sideOffset={sideOffset}
+        align={align}
+        alignOffset={alignOffset}
+        className="z-50"
+      >
+        <TooltipPrimitive.Popup
+          ref={ref}
+          className={(state) =>
+            cn(
+              "relative origin-[var(--transform-origin)] rounded-md bg-primary px-3 py-1.5 text-xs text-primary-foreground transition-[transform,opacity] duration-150 data-[starting-style]:scale-95 data-[starting-style]:opacity-0 data-[ending-style]:scale-95 data-[ending-style]:opacity-0 motion-reduce:transition-none",
+              typeof className === "function" ? className(state) : className,
+            )
+          }
+          {...props}
+        />
+      </TooltipPrimitive.Positioner>
+    </TooltipPrimitive.Portal>
+  ),
+);
+TooltipContent.displayName = "TooltipContent";
 
 const TooltipArrow = React.forwardRef<
-  React.ElementRef<typeof TooltipPrimitive.Arrow>,
+  HTMLDivElement,
   React.ComponentPropsWithoutRef<typeof TooltipPrimitive.Arrow>
->(({ className, ...props }, ref) => (
+>(({ className, children, ...props }, ref) => (
   <TooltipPrimitive.Arrow
     ref={ref}
-    className={cn("fill-primary", className)}
+    className={(state) =>
+      cn(
+        "fill-primary data-[side=top]:-bottom-1 data-[side=bottom]:-top-1 data-[side=bottom]:rotate-180 data-[side=left]:-right-1.5 data-[side=left]:-rotate-90 data-[side=right]:-left-1.5 data-[side=right]:rotate-90",
+        typeof className === "function" ? className(state) : className,
+      )
+    }
     {...props}
-  />
+  >
+    {children ?? (
+      <svg width="10" height="5" viewBox="0 0 10 5" aria-hidden="true">
+        <path d="M0 0h10L5 5Z" />
+      </svg>
+    )}
+  </TooltipPrimitive.Arrow>
 ));
-TooltipArrow.displayName = TooltipPrimitive.Arrow.displayName;
+TooltipArrow.displayName = "TooltipArrow";
 
 export { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger, TooltipArrow };

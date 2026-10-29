@@ -1,10 +1,17 @@
-"use client";
-
 import { useState, useRef, useEffect, type ComponentProps } from "react";
 import { Copy, Check } from "lucide-react";
 import { Button } from "../ui/button";
-import { codeToHtml } from "shiki/bundle/web";
+import { createClientOnlyFn } from "@tanstack/react-start";
 import { cn } from "@/lib/utils";
+
+// Highlighting only runs in the browser; keeping shiki out of the server
+// bundle keeps the Cloudflare Worker under its size limit.
+const codeToHtml = createClientOnlyFn(
+  async (...args: Parameters<typeof import("shiki/bundle/web").codeToHtml>) => {
+    const { codeToHtml } = await import("shiki/bundle/web");
+    return codeToHtml(...args);
+  },
+);
 
 type CodeBlockProps = ComponentProps<"pre">;
 

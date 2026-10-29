@@ -1,87 +1,98 @@
-/* eslint-disable @next/next/no-img-element */
-"use client";
-import { useState } from "react";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
+import { Badge } from "@/components/ui/badge";
 import { DATA } from "@/data/resume";
-import { ChevronDown, ChevronRight } from "lucide-react";
-import { cn } from "@/lib/utils";
-
-function LogoImage({ src, alt }: { src: string; alt: string }) {
-  const [imageError, setImageError] = useState(false);
-
-  if (!src || imageError) {
-    return (
-      <div className="size-8 md:size-10 p-1 border rounded-full shadow ring-2 ring-border bg-muted flex-none" />
-    );
-  }
-
-  return (
-    <img
-      src={src}
-      alt={alt}
-      className="size-8 md:size-10 p-1 border rounded-full shadow ring-2 ring-border overflow-hidden object-contain flex-none"
-      onError={() => setImageError(true)}
-    />
-  );
-}
+import {
+  Timeline,
+  TimelineItem,
+  TimelineConnectItem,
+} from "@/components/timeline";
+import Markdown from "react-markdown";
 
 export default function WorkSection() {
   return (
-    <Accordion type="single" collapsible className="w-full grid gap-6">
-      {DATA.work.map((work) => (
-        <AccordionItem
-          key={work.company}
-          value={work.company}
-          className="w-full border-b-0 grid gap-2"
-        >
-          <AccordionTrigger className="hover:no-underline p-0 cursor-pointer transition-colors rounded-none group [&>svg]:hidden">
-            <div className="flex items-center gap-x-3 justify-between w-full text-left">
-              <div className="flex items-center gap-x-3 flex-1 min-w-0">
-                <LogoImage src={work.logoUrl} alt={work.company} />
-                <div className="flex-1 min-w-0 gap-0.5 flex flex-col">
-                  <div className="font-semibold leading-none flex items-center gap-2">
-                    {work.company}
-                    <span className="relative inline-flex items-center w-3.5 h-3.5">
-                      <ChevronRight
-                        className={cn(
-                          "absolute h-3.5 w-3.5 shrink-0 text-muted-foreground stroke-2 transition-all duration-300 ease-out",
-                          "translate-x-0 opacity-0",
-                          "group-hover:translate-x-1 group-hover:opacity-100",
-                          "group-data-[state=open]:opacity-0 group-data-[state=open]:translate-x-0"
-                        )}
-                      />
-                      <ChevronDown
-                        className={cn(
-                          "absolute h-3.5 w-3.5 shrink-0 text-muted-foreground stroke-2 transition-all duration-200",
-                          "opacity-0 rotate-0",
-                          "group-data-[state=open]:opacity-100 group-data-[state=open]:rotate-180"
-                        )}
-                      />
-                    </span>
-                  </div>
-                  <div className="font-sans text-sm text-muted-foreground">
-                    {work.title}
-                  </div>
-                </div>
-              </div>
-              <div className="flex items-center gap-1 text-xs tabular-nums text-muted-foreground text-right flex-none">
-                <span>
-                  {work.start} - {work.end ?? "Present"}
-                </span>
-              </div>
+    <section id="work" className="overflow-hidden">
+      <div className="flex min-h-0 flex-col gap-y-8 w-full">
+        <div className="flex flex-col gap-y-4 items-center justify-center">
+          <div className="flex items-center w-full">
+            <div className="flex-1 h-px bg-linear-to-r from-transparent from-5% via-border via-95% to-transparent" />
+            <div className="border bg-primary z-10 rounded-xl px-4 py-1">
+              <span className="text-background text-sm font-medium">
+                Experience
+              </span>
             </div>
-          </AccordionTrigger>
-          <AccordionContent className="p-0 ml-13 text-xs sm:text-sm text-muted-foreground">
-            {work.description}
-          </AccordionContent>
-        </AccordionItem>
-      ))}
-    </Accordion>
+            <div className="flex-1 h-px bg-linear-to-l from-transparent from-5% via-border via-95% to-transparent" />
+          </div>
+          <div className="flex flex-col gap-y-3 items-center justify-center">
+            <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl">
+              I like building things
+            </h2>
+            <p className="text-muted-foreground md:text-lg/relaxed lg:text-base/relaxed xl:text-lg/relaxed text-balance text-center">
+              Over 7 years I&apos;ve gone from warehouse access control to
+              real-time earthquake alerts for 2 million people and surgical
+              software for Johnson &amp; Johnson. {DATA.work.length} roles,
+              newest first.
+            </p>
+          </div>
+        </div>
+        <Timeline>
+          {DATA.work.map((work) => (
+            <TimelineItem
+              key={work.title + work.dates}
+              className="w-full flex items-start justify-between gap-10"
+            >
+              <TimelineConnectItem className="flex items-start justify-center">
+                {work.image ? (
+                  <img
+                    src={work.image}
+                    alt={work.title}
+                    className="size-10 bg-card z-10 shrink-0 overflow-hidden p-1 border rounded-full shadow ring-2 ring-border object-contain flex-none"
+                  />
+                ) : (
+                  <div className="size-10 bg-card z-10 shrink-0 overflow-hidden p-1 border rounded-full shadow ring-2 ring-border flex-none flex items-center justify-center text-[9px] font-semibold leading-none tracking-tight">
+                    {work.title.split(" ")[0]}
+                  </div>
+                )}
+              </TimelineConnectItem>
+              <div className="flex flex-1 flex-col justify-start gap-2 min-w-0">
+                {work.dates && (
+                  <time className="text-xs text-muted-foreground">
+                    {work.dates}
+                  </time>
+                )}
+                {work.title && (
+                  <h3 className="font-semibold leading-none">{work.title}</h3>
+                )}
+                {work.location && (
+                  <p className="text-sm text-muted-foreground">
+                    {work.location}
+                  </p>
+                )}
+                {work.description && (
+                  <div className="text-sm text-muted-foreground leading-relaxed wrap-break-word [&_ul]:list-disc [&_ul]:pl-4 [&_ul]:space-y-1 [&_p]:mb-2 [&_p]:last:mb-0 [&_strong]:text-foreground [&_strong]:font-medium">
+                    <Markdown>{work.description}</Markdown>
+                  </div>
+                )}
+                {work.links && work.links.length > 0 && (
+                  <div className="mt-1 flex flex-row flex-wrap items-start gap-2">
+                    {work.links.map((link, idx) => (
+                      <a
+                        href={link.href}
+                        key={idx}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <Badge className="flex items-center gap-1.5 text-xs bg-primary text-primary-foreground">
+                          {link.icon}
+                          {link.title}
+                        </Badge>
+                      </a>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </TimelineItem>
+          ))}
+        </Timeline>
+      </div>
+    </section>
   );
 }
-

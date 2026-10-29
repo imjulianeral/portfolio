@@ -1,5 +1,3 @@
-/* eslint-disable @next/next/no-img-element */
-
 interface MediaContainerProps {
   src: string;
   alt?: string;
